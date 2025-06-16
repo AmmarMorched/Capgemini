@@ -1,0 +1,5 @@
+package com.capgemini.capgemini
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

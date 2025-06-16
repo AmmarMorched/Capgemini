@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "814733654823",
+    "firebase_url": "https://autoiq-cc81c-default-rtdb.firebaseio.com",
+    "project_id": "autoiq-cc81c",
+    "storage_bucket": "autoiq-cc81c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814733654823:android:3fc742d276dd34f8904702",
+        "android_client_info": {
+          "package_name": "com.capgemini.capgemini"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "814733654823-lhdbn3j7f8hau9l7vtf0ucd3dc083n1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALBX9vqWu6hW4l35uzXaQMGg96EYyODqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814733654823-lhdbn3j7f8hau9l7vtf0ucd3dc083n1p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "814733654823-an6us0ul9ips8edtjmk0e4b8c3ib0vce.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.finalApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
