@@ -1,66 +1,65 @@
-import 'package:capgemini/presentation/features/Home/pages/home_screen.dart';
-import 'package:capgemini/presentation/features/auth/pages/login_screen.dart';
-import 'package:capgemini/presentation/features/auth/pages/signup_screen.dart';
-import 'package:capgemini/theme/app_theme.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:capgemini/view_models/OBD_viewmodel.dart';
+import 'package:capgemini/view_models/ObdDiscover_viewmodel.dart';
+import 'package:capgemini/view_models/google_auth_viewmodel.dart';
+import 'package:capgemini/view_models/profile_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'domaine/Services/ModeManager.dart';
-import 'domaine/Services/OBDdiscovery.dart';
-import 'domaine/Services/UserService.dart';
-import 'firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:capgemini/services/UserService.dart';
+import 'package:capgemini/view_models/auth_viewmodel.dart';
+import 'package:capgemini/views/login_screen.dart';
+import 'package:capgemini/views/signup_screen.dart';
+import 'package:capgemini/views/home_screen.dart';
+import 'package:capgemini/utils/app_theme.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize OBD discovery
-  String? discoveredIp;
-
-  try {
-    discoveredIp = await ObdDiscovery.discoverIp();
-  } on Exception catch (e) {
-    debugPrint('OBD discovery failed: $e');
-  }
-
-  // Create ModeManager with default values
-  final modeManager = ModeManager(
-    serverAddress: discoveredIp ?? "127.0.0.1",
-    serverPort: ObdDiscovery.tcpPort,
-  );
-
-  // If we have a discovered IP, try to connect immediately
-  if (discoveredIp != null) {
-    try {
-      await modeManager.initConnection();
-      if (modeManager.isConnected) {
-        debugPrint('Successfully connected to OBD device at $discoveredIp');
-      } else {
-        debugPrint('Failed to connect to OBD device at $discoveredIp');
-      }
-    } catch (e) {
-      debugPrint('Connection error: $e');
-    }
-  } else {
-    debugPrint('No OBD device found, using default connection settings');
-  }
-
-  // Initialize the ModeManagerProvider with our ModeManager instance
-  // Check login status
+  // Check if user is logged in
   final bool loggedIn = await UserService.isLoggedIn();
 
-  runApp(MyApp(loggedIn: loggedIn,),);
+  runApp(
+    MultiProvider(
+      providers: [
+        // Auth ViewModel
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(),
+        ),
+        // Google Auth ViewModel
+        ChangeNotifierProvider(
+          create: (_) => GoogleAuthViewModel(),
+        ),
+
+        // Profile ViewModel
+        ChangeNotifierProvider(
+          create: (_) => ProfileViewModel(),
+        ),
+
+        // OBD Discovery ViewModel
+        ChangeNotifierProvider(
+          create: (_) => ObdDiscoveryViewModel(),
+        ),
+
+        // OBD Data ViewModel (will use discovery service)
+        ChangeNotifierProvider(
+          create: (_) => OBDViewModel(),
+        ),
+      ],
+      child: MyApp(loggedIn: loggedIn),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final bool loggedIn;
 
-  const MyApp({
-    super.key,
-    required this.loggedIn,
-  });
+  const MyApp({super.key, required this.loggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -68,21 +67,10 @@ class MyApp extends StatelessWidget {
       title: 'Vehicle Diagnostics',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: loggedIn
-          ? HomeScreen()
-          : SignUpScreen(),
+      home: loggedIn ? const HomeScreen() : const LoginScreen(),
       routes: {
-        '/login': (context) => LoginScreen(),
-        '/signup': (context) => SignUpScreen(),
-        '/home': (context) => HomeScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/home') {
-          return MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          );
-        }
-        return null;
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignUpScreen(),
       },
     );
   }
